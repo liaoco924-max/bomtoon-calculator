@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>台BOM C 幣回饋計算機</title>
+    <style>
+      :root {
+        --ink: #292635;
+        --muted: #6e697b;
+        --line: #e9e5ee;
+        --pink: #bd4f73;
+        --pinkbar: #c85e81;
+        --purple: #8575b9;
+        --bg: #f8f6fa;
+        --green: #24754d;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 15px/1.6 -apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+      }
+
+      main {
+        max-width: 580px;
+        margin: 28px auto;
+        padding: 28px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        box-shadow: 0 8px 35px #30204408;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 24px;
+      }
+
+      .logo {
+        width: 48px;
+        height: 48px;
+        margin: auto;
+        color: var(--pink);
+        display: grid;
+        place-items: center;
+        background: #fbedf2;
+        border-radius: 15px;
+      }
+
+      h1 {
+        font-size: 26px;
+        margin: 8px 0 0;
+        letter-spacing: .02em;
+      }
+
+      h2 {
+        font-size: 19px;
+        margin: 0 0 12px;
+      }
+
+      p {
+        margin: 0;
+      }
+
+      .sub {
+        font-size: 11px;
+        letter-spacing: .15em;
+        color: var(--muted);
+      }
+
+      .hint {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .intro {
+        margin-top: 7px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .tabs {
+        display: flex;
+        background: #f1eef4;
+        border-radius: 12px;
+        padding: 4px;
+        margin-bottom: 24px;
+        gap: 4px;
+      }
+
+      .tabs button {
+        flex: 1;
+        border: 0;
+        border-radius: 9px;
+        padding: 11px;
+        background: transparent;
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      .tabs button[aria-selected=true] {
+        background: white;
+        color: var(--ink);
+        box-shadow: 0 1px 4px #30204415;
+      }
+
+      button,input {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      button:focus-visible,input:focus-visible {
+        outline: 2px solid var(--purple);
+        outline-offset: 2px;
+      }
+
+      label,.label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 7px;
+      }
+
+      input[type=number],input[type=search] {
+        width: 100%;
+        border: 1px solid #dcd7e4;
+        border-radius: 10px;
+        padding: 12px 14px;
+        background: white;
+        color: var(--ink);
+        min-width: 0;
+      }
+
+      input::placeholder {
+        color: #928c9b;
+      }
+
+      .field {
+        margin: 0 0 16px;
+      }
+
+      .inputline {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .unit {
+        flex: none;
+        font-weight: 600;
+        color: var(--muted);
+      }
+
+      fieldset {
+        border: 0;
+        padding: 0;
+        margin: 22px 0 0;
+        min-width: 0;
+      }
+
+      legend {
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      .radios {
+        display: flex;
+        gap: 9px;
+      }
+
+      .radios label {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        border: 1px solid #ded9e6;
+        border-radius: 10px;
+        padding: 11px 5px;
+        margin: 0;
+        cursor: pointer;
+      }
+
+      .radios label:has(input:checked) {
+        border-color: var(--pink);
+        background: #fcf0f4;
+        color: var(--pink);
+      }
+
+      input[type=radio] {
+        accent-color: var(--pink);
+        width: 17px;
+        height: 17px;
+        margin: 0;
+      }
+
+      .custom {
+        margin-top: 12px;
+      }
+
+      .section {
+        border-top: 1px solid var(--line);
+        margin-top: 24px;
+        padding-top: 22px;
+      }
+
+      .hero {
+        text-align: center;
+        padding: 8px 0 16px;
+      }
+
+      .hero strong {
+        font-size: 64px;
+        line-height: 1.15;
+        color: var(--pink);
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -.03em;
+      }
+
+      .hero .suffix {
+        font-size: 21px;
+        font-weight: 700;
+        margin-left: 5px;
+      }
+
+      .hero .hint {
+        font-size: 14px;
+      }
+
+      .bar {
+        display: flex;
+        overflow: hidden;
+        border-radius: 8px;
+        height: 28px;
+        background: #eeeaf3;
+      }
+
+      .bar div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: white;
+        font-size: 12px;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      .bar .a {
+        background: var(--pinkbar);
+      }
+
+      .bar .b {
+        background: var(--purple);
+      }
+
+      .legend {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--muted);
+        margin: 9px 0 17px;
+        flex-wrap: wrap;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 3px;
+        display: inline-block;
+        margin-right: 5px;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .metric {
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        padding: 12px 14px;
+      }
+
+      .metric span {
+        display: block;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .metric strong {
+        font-size: 26px;
+        line-height: 1.4;
+        font-variant-numeric: tabular-nums;
+        overflow-wrap: anywhere;
+      }
+
+      .metric small {
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .summary {
+        margin-top: 18px;
+        border-top: 1px solid var(--line);
+        padding-top: 12px;
+      }
+
+      .summary div {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 5px 0;
+      }
+
+      .summary strong {
+        font-size: 20px;
+        overflow-wrap: anywhere;
+        text-align: right;
+      }
+
+      .summary .save {
+        color: var(--green);
+      }
+
+      .summary s {
+        color: var(--muted);
+      }
+
+      .message {
+        padding: 20px 12px;
+        text-align: center;
+        color: var(--muted);
+        border: 1px dashed var(--line);
+        border-radius: 12px;
+      }
+
+      .workcard {
+        border-radius: 15px;
+        background: #f6f3f8;
+        padding: 14px;
+        margin-top: 12px;
+      }
+
+      .worktop {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .cover {
+        width: 60px;
+        aspect-ratio: 3/4;
+        object-fit: cover;
+        border-radius: 7px;
+        background: #e8e2ee;
+        flex: none;
+      }
+
+      .worktop strong {
+        font-size: 19px;
+        overflow-wrap: anywhere;
+      }
+
+      .workprices {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        border-top: 1px solid #e4deea;
+        margin-top: 12px;
+        padding-top: 11px;
+      }
+
+      .workprices strong {
+        display: block;
+        font-size: 23px;
+        overflow-wrap: anywhere;
+      }
+
+      .notice {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 11px;
+      }
+
+      .matches {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        margin-top: 6px;
+        overflow: hidden;
+        max-height: 310px;
+        overflow-y: auto;
+      }
+
+      .match {
+        width: 100%;
+        border: 0;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        background: white;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        color: var(--ink);
+      }
+
+      .match:last-child {
+        border-bottom: 0;
+      }
+
+      .match:hover {
+        background: #f8f5fa;
+      }
+
+      .match .cover {
+        width: 37px;
+      }
+
+      .match .desc {
+        flex: 1;
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+
+      .match small {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .status {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 8px;
+      }
+
+      .error {
+        color: #a4344e;
+      }
+
+      footer {
+        text-align: center;
+        margin-top: 24px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      [hidden] {
+        display: none!important;
+      }
+
+      @media(max-width:600px) {
+        body {
+          background: white;
+        }
+
+        main {
+          border: 0;
+          border-radius: 0;
+          box-shadow: none;
+          margin: 0;
+          padding: 23px 18px 30px;
+        }
+
+        .hero strong {
+          font-size: 58px;
+        }
+
+        .metric {
+          padding: 10px 12px;
+        }
+
+        h1 {
+          font-size: 24px;
+        }
+
+      }
+    </style>
+  </head>
+
+  <body>
+    <main>
+
+      <header>
+        <div class="logo" aria-hidden="true">
+          <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M8 6h8M8 10h1m3 0h1m3 0h.1M8 14h1m3 0h1m3 0h.1M8 18h1m3 0h1m3 0h.1"/></svg>
+        </div>
+        <h1>台BOM C 幣回饋計算機</h1>
+        <p class="sub">BOMTOON REWARD CALCULATOR</p>
+        <p class="intro">精算活動期間購買話數，善用回饋 C 幣！</p>
+      </header>
+      <div class="tabs" role="tablist" aria-label="計算模式">
+        <button id="manualTab" role="tab" aria-selected="true" aria-controls="manualPanel">手動計算</button>
+        <button id="workTab" role="tab" aria-selected="false" aria-controls="workPanel">作品查詢</button>
+      </div>
+      <section id="manualPanel" role="tabpanel" aria-labelledby="manualTab">
+        <div class="field">
+          <label for="total">全部購買所需 C 數</label>
+          <div class="inputline"><input id="total" type="number" min="1" max="100000000" step="1" inputmode="numeric" placeholder="例如 225"><span class="unit">C</span></div>
+        </div>
+        <div class="field">
+          <label for="unit">單話購買所需 C 數</label>
+          <div class="inputline"><input id="unit" type="number" min="1" max="100000000" step="1" inputmode="numeric" placeholder="例如 3"><span class="unit">C／話</span></div>
+        </div>
+        <p id="manualHint" class="hint">請輸入尚未購買的總 C 數及單話價格。</p>
+      </section>
+      <section id="workPanel" role="tabpanel" aria-labelledby="workTab" hidden>
+        <label for="query">選擇作品</label>
+        <input id="query" type="search" autocomplete="off" maxlength="100" placeholder="輸入作品名稱搜尋">
+        <p id="searchStatus" class="status" role="status">輸入作品名稱即可搜尋。</p>
+        <div id="matches" class="matches" hidden></div>
+        <div id="workcard" class="workcard" hidden>
+          <div class="worktop">
+            <img id="cover" class="cover" alt="" hidden>
+            <div>
+              <strong id="workTitle"></strong>
+              <p id="author" class="hint"></p>
+              <p id="chapterInfo" class="hint"></p>
+            </div>
+          </div>
+          <div class="workprices" id="workPrices">
+            <div><span class="hint">單話永久持有價格</span><strong id="workUnit"></strong></div>
+            <div><span class="hint">全部永久持有所需</span><strong id="workTotal"></strong></div>
+          </div>
+          <p class="notice">資料僅作參考，如欲及時準確算法請用手動計算</p>
+          <p class="hint" id="updated"></p>
+        </div>
+        <p id="workError" class="status error" role="status" hidden></p>
+        <div class="field" id="ownedField" hidden style="margin-top:16px">
+          <label for="owned">已購買前幾話（選填）</label>
+          <div class="inputline"><input type="number" id="owned" min="0" step="1" value="0" inputmode="numeric"><span class="unit">付費話</span></div>
+          <p class="hint" id="ownedHint">以已購買最前面的付費章節計算，不含永久持有價格為 0 的話數。</p>
+        </div>
+      </section>
+
+      <fieldset>
+        <legend>活動 C 幣回饋比例</legend>
+        <div class="radios"><label><input type="radio" name="rate" value="30" checked>30%</label><label><input type="radio" name="rate" value="50">50%</label><label><input type="radio" name="rate" value="other">其他</label></div>
+        <div id="customField" class="inputline custom" hidden><input id="custom" type="number" min="0" max="100" step="0.01" inputmode="decimal" placeholder="輸入回饋比例" aria-label="自訂回饋百分比"><span class="unit">%</span></div>
+      </fieldset>
+
+      <section class="section" aria-live="polite">
+        <h2>最佳購買方案</h2>
+        <div id="empty" class="message">請輸入總 C 數及單話價格，即可計算。</div>
+        <div id="result" hidden>
+          <div class="hero">
+            <p class="hint">活動期間只需要購買</p>
+            <div><strong id="count"></strong><span class="suffix">話</span></div>
+            <p class="hint">實際需準備 <b id="spendHero"></b> C</p>
+          </div>
+          <div class="bar" aria-hidden="true">
+            <div class="a" id="barA"></div>
+            <div class="b" id="barB"></div>
+          </div>
+          <div class="legend"><span><i class="dot" style="background:var(--pinkbar)"></i>活動期間購買</span><span><i class="dot" style="background:var(--purple)"></i>回饋 C 購買</span></div>
+          <div class="metrics">
+            <div class="metric"><span>活動期間花費</span><strong id="spend"></strong> <small>C</small></div>
+            <div class="metric"><span>活動回饋獲得</span><strong id="reward"></strong> <small>C</small></div>
+            <div class="metric"><span>剩餘需購買話數</span><strong id="remaining"></strong> <small>話</small></div>
+            <div class="metric"><span>剩餘話數所需</span><strong id="remainingCost"></strong> <small>C</small></div>
+          </div>
+          <div class="summary">
+            <div><span>原本全部購買所需</span><s id="original"></s></div>
+            <div><b>實際需要花費</b><strong id="actual"></strong></div>
+            <div><b>成功節省</b><strong class="save" id="saved"></strong></div>
+            <div><span>回饋使用完後剩餘</span><strong id="left"></strong></div>
+          </div>
+        </div>
+      </section>
+
+      <footer>本工具為非官方試算工具，實際回饋依活動規則為準。<br>預設回饋 C 幣無條件捨去至整數、無回饋上限；作品查詢以永久持有價格試算，不含租借或其他優惠。</footer>
+    </main>
+
+    <script>
+      'use strict';
+
+      // 部署後只需將下方換成計算機 GAS 的公開 /exec 網址。
+      const BOM_CALC_API_URL = '請填入GAS網頁應用程式exec網址';
+
+      function apiCall(action, params = {}) {
+          return new Promise((resolve, reject) => {
+              let url;
+              try {
+                  url = new URL(BOM_CALC_API_URL);
+                  if (url.origin !== 'https://script.google.com' ||
+                      !/^\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(url.pathname)) {
+                      throw new Error('尚未設定正確的 GAS /exec 網址。');
+                  }
+              } catch (_) {
+                  reject(new Error('尚未設定正確的 GAS /exec 網址。'));
+                  return;
+              }
+              const bytes = crypto.getRandomValues(new Uint8Array(16));
+              const callback = 'bomCalcCb_' + Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+              url.search = new URLSearchParams({action, ...params, callback}).toString();
+              const script = document.createElement('script');
+              let settled = false;
+              let timeout;
+              function finish(error, data) {
+                  if (settled) return;
+                  settled = true;
+                  clearTimeout(timeout);
+                  script.remove();
+                  delete window[callback];
+                  if (error) reject(error);
+                  else resolve(data);
+              }
+              window[callback] = response => {
+                  if (!response || response.ok !== true) {
+                      finish(new Error(response?.message || '資料服務回應異常。'));
+                  } else {
+                      finish(null, response.data);
+                  }
+              };
+              script.onerror = () => finish(new Error('無法連線至資料服務。'));
+              script.onload = () => {
+                  if (!settled) finish(new Error('資料服務回應格式異常。'));
+              };
+              timeout = setTimeout(() => finish(new Error('資料服務連線逾時。')), 45000);
+              script.src = url.href;
+              script.referrerPolicy = 'no-referrer';
+              document.head.appendChild(script);
+          });
+      }
+
+      // 純計算：整數 C 與百分比基點（30% = 3000），避免浮點進位誤差。
+      function solveReward(pricesOrTotal, unit, bps) {
+          const integer = n => Number.isSafeInteger(n) && n >= 0;
+          if (!integer(bps) || bps > 10000)
+              throw Error('請輸入 0–100% 的回饋比例，最多兩位小數。');
+          const uniform = !Array.isArray(pricesOrTotal);
+          let n, total, priceAt;
+          if (uniform) {
+              total = pricesOrTotal;
+              if (!integer(total) || !integer(unit) || unit === 0 || total % unit !== 0)
+                  throw Error('總 C 數須為單話 C 數的整數倍。');
+              n = total / unit;
+              priceAt = () => unit;
+          }
+          else {
+              if (pricesOrTotal.some(p => !integer(p) || p === 0))
+                  throw Error('章節價格無效。');
+              n = pricesOrTotal.length;
+              total = pricesOrTotal.reduce((s, p) => s + p, 0);
+              priceAt = i => pricesOrTotal[i];
+          }
+          if (!integer(total) || total > 100000000)
+              throw Error('總 C 數超過試算範圍。');
+          const rebate = s => Math.floor(s * bps / 10000);
+          let count = 0, spend = 0;
+          if (uniform) { // 二分搜尋最少購買話數，無需建立超大陣列。
+              let lo = 0, hi = n;
+              while (lo < hi) {
+                  const mid = Math.floor((lo + hi) / 2), s = mid * unit;
+                  if (s + rebate(s) >= total)
+                      hi = mid;
+                  else
+                      lo = mid + 1;
+              }
+              count = lo;
+              spend = count * unit;
+          }
+          else {
+              while (count < n && spend + rebate(spend) < total) {
+                  spend += priceAt(count);
+                  count++;
+              }
+          }
+          const reward = rebate(spend), remaining = n - count, remainingCost = total - spend;
+          return { n, total, count, spend, reward, remaining, remainingCost, left: reward - remainingCost, saved: remainingCost };
+      }
+      const $ = id => document.getElementById(id), fmt = n => n.toLocaleString('zh-TW');
+      let mode = 'manual', work = null, request = 0, timer = null;
+      function show(id, v) { $(id).hidden = !v; }
+      function text(id, v) { $(id).textContent = v; }
+      function setMode(m) { mode = m; for (const t of ['manual', 'work']) {
+          $(t + 'Tab').setAttribute('aria-selected', String(t === m));
+          show(t + 'Panel', t === m);
+      } render(); }
+      function errorMessage(m) { show('result', false); show('empty', true); text('empty', m); }
+      function readBps() { const v = document.querySelector('input[name=rate]:checked').value; const s = v === 'other' ? $('custom').value.trim() : v; if (!/^\d+(?:\.\d{1,2})?$/.test(s) || Number(s) > 100)
+          throw Error('請輸入 0–100% 的回饋比例，最多兩位小數。'); return Math.round(Number(s) * 100); }
+      function render() {
+          const custom = document.querySelector('input[name=rate]:checked').value === 'other';
+          show('customField', custom);
+          try {
+              let args;
+              if (mode === 'manual') {
+                  const a = $('total').value, b = $('unit').value, t = Number(a), u = Number(b);
+                  if (!a || !b) {
+                      text('manualHint', '請輸入尚未購買的總 C 數及單話價格。');
+                      return errorMessage('請輸入總 C 數及單話價格，即可計算。');
+                  }
+                  if (!Number.isSafeInteger(t) || !Number.isSafeInteger(u) || t <= 0 || u <= 0 || t > 100000000 || u > 100000000) {
+                      text('manualHint', '請輸入有效的正整數 C 數。');
+                      return errorMessage('請輸入有效的正整數 C 數。');
+                  }
+                  if (t % u) {
+                      text('manualHint', '總 C 數須為單話 C 數的整數倍；不同價格章節請使用作品查詢。');
+                      return errorMessage('總 C 數不是單話 C 數的整數倍。');
+                  }
+                  text('manualHint', '依照輸入金額，共有 ' + fmt(t / u) + ' 話需要購買。');
+                  args = [t, u];
+              }
+              else {
+                  if (!work)
+                      return errorMessage('請先選擇已核對價格的作品。');
+                  const raw = $('owned').value, n = raw === '' ? 0 : Number(raw);
+                  if (!Number.isSafeInteger(n) || n < 0 || n > work.prices.length)
+                      return errorMessage('已購買話數須介於 0 至 ' + work.prices.length + '。');
+                  args = [work.prices.slice(n), null];
+              }
+              const x = solveReward(...args, readBps());
+              show('empty', false);
+              show('result', true);
+              for (const k of ['count', 'spend', 'reward', 'remaining', 'remainingCost'])
+                  text(k, fmt(x[k]));
+              text('spendHero', fmt(x.spend));
+              for (const [k, v] of Object.entries({ original: x.total, actual: x.spend, saved: x.saved, left: x.left }))
+                  text(k, fmt(v) + ' C');
+              const p = x.n ? x.count / x.n * 100 : 0;
+              $('barA').style.width = p + '%';
+              $('barB').style.width = (x.n ? 100 - p : 0) + '%';
+              text('barA', x.count || '');
+              text('barB', x.remaining || '');
+          }
+          catch (e) {
+              errorMessage(e.message);
+          }
+      }
+      function addCover(img, url) { img.hidden = !url; if (url)
+          img.src = url;
+      else
+          img.removeAttribute('src'); img.onerror = () => { img.hidden = true; }; }
+      function clearWork() { work = null; show('workcard', false); show('ownedField', false); show('workError', false); $('owned').value = '0'; render(); }
+      function setWorkCard(w) { show('workcard', true); text('workTitle', w.title); text('author', w.author || ''); addCover($('cover'), w.cover); }
+      function choose(w) {
+          clearTimeout(timer);
+          const seq = ++request;
+          clearWork();
+          $('query').value = w.title;
+          show('matches', false);
+          text('searchStatus', '正在讀取作品價格…');
+          setWorkCard(w);
+          show('workPrices', false);
+          text('chapterInfo', '');
+          text('updated', '');
+          apiCall('work', {id: w.id}).then(res => {
+              if (seq !== request)
+                  return;
+              text('searchStatus', '');
+              if (!res.ok) {
+                  if (res.work) {
+                      setWorkCard(res.work);
+                      // 章節明細核對失敗時仍可參考主檔總額，但不產出購買方案。
+                      if (Number.isSafeInteger(res.work.total) && res.work.total >= 0) {
+                          show('workPrices', true);
+                          text('workUnit', '—');
+                          text('workTotal', fmt(res.work.total) + ' C');
+                          text('updated', '資料更新：' + res.work.updatedAt + '（台灣時間）');
+                      }
+                  }
+                  text('workError', res.message);
+                  show('workError', true);
+                  return;
+              }
+              work = res.work;
+              setWorkCard(work);
+              show('workPrices', true);
+              text('chapterInfo', `資料庫中 ${fmt(work.paidCount)} 話需付費永久持有`);
+              const prices = [...new Set(work.prices)].sort((a, b) => a - b);
+              text('workUnit', prices.length ? prices.map(fmt).join(' / ') + ' C' : '0 C');
+              text('workTotal', fmt(work.total) + ' C');
+              text('updated', '資料更新：' + work.updatedAt + '（台灣時間）');
+              $('owned').max = work.paidCount;
+              show('ownedField', true);
+              text('ownedHint', work.ordered ? '以已購買最前面的付費章節計算，不含永久持有價格為 0 的話數。' : '單價一致，可直接輸入已購買付費話數。');
+              render();
+          }).catch(err => {
+              if (seq !== request) return;
+              text('searchStatus', '');
+              text('workError', err.message + ' 請稍後重新搜尋或使用手動計算。');
+              show('workError', true);
+          });
+      }
+      function search() {
+          const q = $('query').value.trim();
+          const seq = ++request;
+          clearTimeout(timer);
+          clearWork();
+          show('matches', false);
+          $('matches').replaceChildren();
+          if (!q) {
+              text('searchStatus', '輸入作品名稱即可搜尋。');
+              return;
+          }
+          text('searchStatus', '搜尋中…');
+          timer = setTimeout(() => {
+              apiCall('search', {q}).then(list => { if (seq !== request)
+                  return; text('searchStatus', list.length ? '請選擇作品（最多顯示 12 筆）。' : '找不到符合的作品。'); const target = $('matches'); target.replaceChildren(); for (const w of list) {
+                  const b = document.createElement('button');
+                  b.type = 'button';
+                  b.className = 'match';
+                  const img = document.createElement('img');
+                  img.alt = '';
+                  img.className = 'cover';
+                  addCover(img, w.cover);
+                  const d = document.createElement('span');
+                  d.className = 'desc';
+                  const title = document.createElement('b');
+                  title.textContent = w.title;
+                  const sub = document.createElement('small');
+                  sub.textContent = [w.author, w.ready ? '價格已核對' : '價格待核對'].filter(Boolean).join(' · ');
+                  d.append(title, sub);
+                  b.append(img, d);
+                  b.addEventListener('click', () => choose(w));
+                  target.append(b);
+              } show('matches', list.length > 0); }).catch(err => {
+                  if (seq === request) text('searchStatus', err.message + ' 請稍後再試。');
+              });
+          }, 300);
+      }
+      $('manualTab').addEventListener('click', () => setMode('manual'));
+      $('workTab').addEventListener('click', () => setMode('work'));
+      for (const id of ['total', 'unit', 'custom', 'owned'])
+          $(id).addEventListener('input', render);
+      document.querySelectorAll('input[name=rate]').forEach(e => e.addEventListener('change', render));
+      $('query').addEventListener('input', search);
+      render();
+    </script>
+  </body>
+</html>
